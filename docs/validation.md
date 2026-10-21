@@ -4,6 +4,14 @@ Validation covers static checks, Board Manager generation, CMake configuration, 
 
 `libraries/lvgl` is intentionally retained for Arduino. Repository validation accepts this dependency; ESP-IDF display projects still require managed LVGL in their manifests. Earlier failure reports below about an offline LVGL tree describe the former validation rule, which has been removed. The library's existing edits and whitespace findings are outside this cleanup's scope.
 
+## Board Manager dependency ownership (2026-10-21)
+
+All 12 product adapters now obtain Board Manager through the public dependency of the online Waveshare board pack. Their CMake requirements still include both components. The old exact `0.7.3~1` manifest entries, including the factory source's entry, have been removed; static validation checks this ownership and the retained CMake dependency.
+
+Fresh temporary copies of `01_i2c_scan` on ESP-IDF v5.5.5 and `10_walkie_talkie` on local IDF 6.2 revision `08e0d30a74ad0bfd5a34933142b80f45619ee410` resolved Waveshare Boards 0.1.2 and Board Manager 0.7.4. Both passed initial configuration, `idf.py bmgr -l`, selection of `esp32_s3_lr1121_oled_1_54_xf`, and configuration with the generated board. The product appeared in both board lists. Generated build metadata includes the board pack, Board Manager and `gen_bmgr_codes`; the product adapter receives both managed and generated header paths.
+
+The other projects' manifests and CMake requirements were checked statically. These checks did not compile or link firmware, exercise the pinned CI 6.2 revision, or access hardware. Existing application build directories, dependency locks and SDK configurations were preserved.
+
 ## Online board integration (2026-10-12)
 
 Registry board pack 0.1.2 includes `esp32_s3_lr1121_oled_1_54_xf`. All 50 published files passed size and SHA-256 checks, and the product YAML matches upstream revision `a226300a947a7edb5f31925666394a0a64079325`. All 12 maintained GPIO headers match that profile. The 11 deleted example board directories remain absent; the factory retains its local profile. Dependencies continue to request `*`.

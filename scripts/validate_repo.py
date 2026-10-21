@@ -16,6 +16,7 @@ def validate(root=ROOT):
     assert board_pack["board"] == cfg["board"]
     assert board_pack["component"] == "waveshare/waveshare_boards"
     assert board_pack["version"] == "*", "Allow the latest compatible board-pack release"
+    assert cfg["board_manager"]["provider"] == board_pack["component"]
     checks = 0
     for framework in ("esp-idf", "arduino"):
         examples = discover(framework, root)
@@ -40,6 +41,8 @@ def validate(root=ROOT):
                 assert not (p / "components" / "ws_board").exists(), f"Duplicate support component: {e['path']}"
                 local_cmake = (local / "CMakeLists.txt").read_text()
                 assert "set(board_requires waveshare__waveshare_boards " in local_cmake, e["path"]
+                requirements = re.search(r"set\(board_requires\s+([^)]*)\)", local_cmake)
+                assert requirements and "esp_board_manager" in requirements[1].split(), e["path"]
                 assert "list(APPEND board_requires gen_bmgr_codes)" in local_cmake, e["path"]
                 assert "WHOLE_ARCHIVE" in local_cmake, e["path"]
                 assert not (p / "components/bsp_extra").exists(), e["path"]
@@ -63,7 +66,10 @@ def validate(root=ROOT):
                 assert not any("esp32_s3_lr1121" in d for d in manifest["dependencies"]), e["path"]
                 local_deps = yaml.safe_load((local / "idf_component.yml").read_text())["dependencies"]
                 assert local_deps["idf"] == cfg["idf_version_range"], e["path"]
-                assert local_deps["espressif/esp_board_manager"]["version"] == cfg["board_manager"], e["path"]
+                for deps in (manifest["dependencies"], local_deps):
+                    assert "espressif/esp_board_manager" not in deps, (
+                        f"Resolve Board Manager through {board_pack['component']}: {e['path']}"
+                    )
                 sources = {"setup_device.c"}
                 headers = {"board_support.h", "board_hardware.h"}
                 if e["name"] in cfg["idf_sensor_examples"]:

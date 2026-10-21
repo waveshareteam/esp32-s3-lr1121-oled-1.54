@@ -2,6 +2,8 @@
 
 Framework and driver versions were resolved on 2026-10-08 and are pinned in `config/frameworks.json` and each example's local adapter manifest. Waveshare Boards uses `version: "*"` to select the latest compatible release; this policy was updated on 2026-10-10.
 
+On 2026-10-21, all 12 product adapters removed their direct Board Manager pin. The online Waveshare board pack supplies its public dependency; registry pack 0.1.2 requires `>=0.7.2`, and current resolution selects Board Manager 0.7.4. The provider and verified version are recorded in `config/frameworks.json`; `verified_version` is not a pin. CMake continues to require Board Manager explicitly for public headers and linking.
+
 | Surface | Version | Primary-source evidence | Decision |
 |---|---|---|---|
 | ESP-IDF 5.5 | v5.5.5 | [official version/target index](https://dl.espressif.com/dl/esp-idf/idf_versions.js) lists ESP32-S3; latest stable 5.5 patch | 12 source projects |
@@ -9,7 +11,7 @@ Framework and driver versions were resolved on 2026-10-08 and are pinned in `con
 | ESP-IDF 6.2 development | `624ded6069c4399e190d62b39ea67d2789ea496f` | [official commit](https://github.com/espressif/esp-idf/commit/624ded6069c4399e190d62b39ea67d2789ea496f); version metadata is 6.2.0 and ESP32-S3 is a supported target | Separate compatibility lane for all 12 projects; not a stable release |
 | Arduino-ESP32 | 3.3.12 | [official release](https://github.com/espressif/arduino-esp32/releases/tag/3.3.12), based on IDF 5.5.5; [stable package index](https://espressif.github.io/arduino-esp32/package_esp32_index.json) | 11 sketches |
 | Waveshare Boards | Latest compatible (`*`) | [registry](https://components.espressif.com/components/waveshare/waveshare_boards); product profile verified with 0.1.2 | Online product YAML for the 11 IDF examples; factory source retains its local profile |
-| Board Manager | 0.7.3~1 | [registry](https://components.espressif.com/components/espressif/esp_board_manager/versions/0.7.3~1); official generator and ESP32-S3 capability catalogs inspected | Local product YAML and adapters; custom I2C OLED / sensor / audio composition entries |
+| Board Manager | Resolved through Waveshare Boards; verified 0.7.4 | [registry](https://components.espressif.com/components/espressif/esp_board_manager/versions/0.7.4); online board pack declares the public dependency | All 12 source projects; custom I2C OLED / sensor / audio composition entries |
 | LVGL Adapter | 0.7.0 | [registry](https://components.espressif.com/components/espressif/esp_lvgl_adapter/versions/0.7.0); manifest requires IDF >=5.5 and LVGL >=8,<10 | Display builds only |
 | LVGL | 9.5.0 | [registry](https://components.espressif.com/components/lvgl/lvgl/versions/9.5.0) | Same upstream release in IDF and Arduino; major-9 compile guard |
 | ESP32_Display_Panel | 1.0.4 assessed | [registry](https://components.espressif.com/components/espressif/esp32_display_panel/versions/1.0.4); no SSD1309 driver in official sources | Not used; retain bundled Arduino_GFX 1.6.5 OLED transport |
